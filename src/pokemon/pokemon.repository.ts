@@ -31,6 +31,44 @@ export class PokemonRepository {
     }
 
     this.logger.error(`error while fetching data to API ${url}`);
-    throw new Error(`HTTP Error! Status ${response.status}`);
+    throw new Error(`HTTP Error! Status ${response.status} | ${url}`);
+  }
+
+  public async getByNameBulk(namesToFind: string[]) {
+    const promises = namesToFind.map(this.getByName);
+
+    const generalResponse = await Promise.allSettled(promises);
+
+    const { fulfilled, rejected } = generalResponse.reduce(
+      ({ fulfilled, rejected }, cur) => {
+        if (cur.status === 'fulfilled') {
+          return {
+            fulfilled: [...fulfilled, cur.value],
+            rejected,
+          };
+        }
+
+        return { fulfilled, rejected: [...rejected, cur.reason] };
+      },
+      { fulfilled: [], rejected: [] },
+    );
+
+    if (rejected.length > 0) {
+      this.logger.error({
+        message: `getByNameBulk found some errors\n${rejected.join('\n')}`,
+      });
+    }
+
+    const responses = fulfilled.map(
+      (pokemon: PromiseFulfilledResult<IPokemon>) => {
+        return pokemon.value;
+      },
+    );
+
+    if (responses.length === 0 && rejected.length > 0) {
+      throw new Error(`HTTP Error! No results found`);
+    }
+
+    return responses;
   }
 }

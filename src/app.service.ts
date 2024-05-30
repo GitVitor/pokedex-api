@@ -15,15 +15,11 @@ export class AppService {
   ): Promise<{ count: number; data: GetPokemonListDTO[] }> {
     const resources = await this.pokemonRepository.getAll(offset, limit);
 
-    const promises = resources.results.map(({ name }) => {
-      return this.getByName(name);
-    });
+    const pokemonsToFind = resources.results.map(({ name }) => name);
 
-    const response = (await Promise.allSettled(promises))
-      .filter((response) => response.status === 'fulfilled')
-      .map((response: PromiseFulfilledResult<IPokemon>) => {
-        return convertPokemonToPokemonListDTO(response.value);
-      });
+    const response = (
+      await this.pokemonRepository.getByNameBulk(pokemonsToFind)
+    ).map((response: IPokemon) => convertPokemonToPokemonListDTO(response));
 
     return { count: resources.count, data: response };
   }
@@ -32,22 +28,16 @@ export class AppService {
     const resources = await this.pokemonRepository.getAll(0, 99999);
     const nameToFindLower = nameToFind.toLowerCase();
 
-    const promises = resources.results
+    const pokemonsToFind = resources.results
       .filter(({ name }) => name.toLowerCase().includes(nameToFindLower))
-      .map(({ name }) => this.getByName(name));
+      .map(({ name }) => name);
 
-    const response = (await Promise.allSettled(promises))
-      .filter((response) => response.status === 'fulfilled')
-      .map((response: PromiseFulfilledResult<IPokemon>) => {
-        return convertPokemonToPokemonListDTO(response.value);
-      });
+    const response = (
+      await this.pokemonRepository.getByNameBulk(pokemonsToFind)
+    )
+      .map((response: IPokemon) => convertPokemonToPokemonListDTO(response))
+      .slice(offset, limit);
 
     return { count: resources.count, data: response };
-  }
-
-  async getByName(query: string) {
-    const allData = await this.pokemonRepository.getByName(query);
-
-    return allData;
   }
 }

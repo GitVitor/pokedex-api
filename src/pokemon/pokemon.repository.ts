@@ -35,7 +35,7 @@ export class PokemonRepository {
   }
 
   public async getByNameBulk(namesToFind: string[]) {
-    const promises = namesToFind.map(this.getByName);
+    const promises = namesToFind.map((name) => this.getByName(name));
 
     const generalResponse = await Promise.allSettled(promises);
 
@@ -59,16 +59,10 @@ export class PokemonRepository {
       });
     }
 
-    const responses = fulfilled.map(
-      (pokemon: PromiseFulfilledResult<IPokemon>) => {
-        return pokemon.value;
-      },
-    );
-
-    if (responses.length === 0 && rejected.length > 0) {
+    if (fulfilled.length === 0 && rejected.length > 0) {
       throw new Error(`HTTP Error! No results found`);
     }
 
-    return responses;
+    return fulfilled;
   }
 }

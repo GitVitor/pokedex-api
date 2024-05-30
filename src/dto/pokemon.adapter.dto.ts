@@ -18,7 +18,10 @@ export class GetPokemonListDTO {
   background: string;
 }
 
-export function convertPokemonToPokemonListDTO(pokemon: IPokemon) {
+export function convertPokemonToPokemonListDTO(
+  pokemon: IPokemon,
+  background: string,
+) {
   return {
     name: pokemon.name,
     attack: pokemon.stats.filter((stat) => {
@@ -28,6 +31,6 @@ export function convertPokemonToPokemonListDTO(pokemon: IPokemon) {
       return stat.stat.name === 'defense';
     })[0],
     types: pokemon.types,
-    background: pokemon.sprites.front_default || pokemon.sprites.back_default,
+    background,
   };
 }

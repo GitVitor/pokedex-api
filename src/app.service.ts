@@ -19,7 +19,10 @@ export class AppService {
 
     const response = (
       await this.pokemonRepository.getByNameBulk(pokemonsToFind)
-    ).map((response: IPokemon) => convertPokemonToPokemonListDTO(response));
+    ).map((response: IPokemon) => {
+      const background = this.findBestBackgroundPicture(response.sprites);
+      return convertPokemonToPokemonListDTO(response, background);
+    });
 
     return { count: resources.count, data: response };
   }
@@ -35,9 +38,19 @@ export class AppService {
     const response = (
       await this.pokemonRepository.getByNameBulk(pokemonsToFind)
     )
-      .map((response: IPokemon) => convertPokemonToPokemonListDTO(response))
+      .map((response: IPokemon) => {
+        const background = this.findBestBackgroundPicture(response.sprites);
+        return convertPokemonToPokemonListDTO(response, background);
+      })
       .slice(offset, limit);
 
     return { count: resources.count, data: response };
+  }
+
+  private findBestBackgroundPicture(sprites: IPokemon['sprites']): string {
+    if (sprites.other?.['official-artwork']) {
+      return this.findBestBackgroundPicture(sprites.other['official-artwork']);
+    }
+    return sprites.front_default || sprites.back_default;
   }
 }

@@ -71,6 +71,9 @@ interface PokemonSprites {
   front_female: string | null;
   front_shiny: string | null;
   front_shiny_female: string | null;
+  other?: {
+    'official-artwork': Omit<PokemonSprites, 'other'>;
+  };
 }
 
 interface Move {

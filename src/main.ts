@@ -5,6 +5,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors();
+
   const config = new DocumentBuilder()
     .setTitle('Pokedex API')
     .setDescription('Pokedex API that provide access to some Pokemon data')

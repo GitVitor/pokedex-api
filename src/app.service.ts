@@ -16,7 +16,7 @@ export class AppService {
     const resources = await this.pokemonRepository.getAll(offset, limit);
 
     const promises = resources.results.map(({ name }) => {
-      return this.findByName(name);
+      return this.getByName(name);
     });
 
     const response = (await Promise.allSettled(promises))
@@ -28,8 +28,25 @@ export class AppService {
     return { count: resources.count, data: response };
   }
 
-  async findByName(query: string) {
-    const allData = await this.pokemonRepository.findByName(query);
+  async searchByName(nameToFind: string, offset: number, limit: number) {
+    const resources = await this.pokemonRepository.getAll(0, 99999);
+    const nameToFindLower = nameToFind.toLowerCase();
+
+    const promises = resources.results
+      .filter(({ name }) => name.toLowerCase().includes(nameToFindLower))
+      .map(({ name }) => this.getByName(name));
+
+    const response = (await Promise.allSettled(promises))
+      .filter((response) => response.status === 'fulfilled')
+      .map((response: PromiseFulfilledResult<IPokemon>) => {
+        return convertPokemonToPokemonListDTO(response.value);
+      });
+
+    return { count: resources.count, data: response };
+  }
+
+  async getByName(query: string) {
+    const allData = await this.pokemonRepository.getByName(query);
 
     return allData;
   }

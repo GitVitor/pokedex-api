@@ -22,7 +22,7 @@ export class PokemonRepository {
     throw new Error(`HTTP Error! Status ${response.status}`);
   }
 
-  public async findByName(name: string): Promise<IPokemon> {
+  public async getByName(name: string): Promise<IPokemon> {
     const url = `${this.API_BASEURL}/pokemon/${name}`;
     const response = await fetch(url);
 

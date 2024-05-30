@@ -35,10 +35,17 @@ export class AppController {
   })
   @ApiQuery({ name: 'offset', type: 'number', required: false })
   @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({
+    name: 'name',
+    type: 'string',
+    required: false,
+    description: 'Use this query to query Pokemons by name',
+  })
   @ApiExtraModels(PaginatedDTO, GetPokemonListDTO)
   @Get('/')
   public async getAll(
     @Req() req: Request,
+    @Query('name') name?: string,
     @Query('offset') offset?: number,
     @Query('limit') limit = 20,
   ): Promise<PaginatedDTO<GetPokemonListDTO>> {
@@ -47,7 +54,13 @@ export class AppController {
       message: 'request received',
     });
 
-    const { data, count: total } = await this.appService.getAll(offset, limit);
+    const hasNameToFilter = name?.trim().length > 0;
+
+    const getDataFn = hasNameToFilter
+      ? () => this.appService.searchByName(name, offset, limit)
+      : () => this.appService.getAll(offset, limit);
+
+    const { data, count: total } = await getDataFn();
 
     return {
       total,
@@ -69,6 +82,6 @@ export class AppController {
       message: 'request received',
     });
 
-    return this.appService.findByName(query);
+    return this.appService.getByName(query);
   }
 }

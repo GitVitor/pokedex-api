@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { IPokemon, IPokemonResource } from '../interface/pokemon.interface';
+import { ISpecie } from '../interface/specie.interface';
 
 @Injectable()
 export class PokemonRepository {
@@ -24,6 +25,18 @@ export class PokemonRepository {
 
   public async getByName(name: string): Promise<IPokemon> {
     const url = `${this.API_BASEURL}/pokemon/${name}`;
+    const response = await fetch(url);
+
+    if (response.ok) {
+      return response.json();
+    }
+
+    this.logger.error(`error while fetching data to API ${url}`);
+    throw new Error(`HTTP Error! Status ${response.status} | ${url}`);
+  }
+
+  public async getSpecie(id: number): Promise<ISpecie> {
+    const url = `${this.API_BASEURL}/pokemon-species/${id}/`;
     const response = await fetch(url);
 
     if (response.ok) {

@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import {
   GetPokemonListDTO,
   convertPokemonToPokemonListDTO,
-} from './dto/pokemon.adapter.dto';
+} from './dto/get-pokemon-list.dto';
 import { IPokemon } from './interface/pokemon.interface';
 import { PokemonRepository } from './pokemon/pokemon.repository';
+import { convertPokemonToGetPokemonDTO } from './dto/get-pokemon.dto';
 
 @Injectable()
 export class AppService {
@@ -52,5 +53,12 @@ export class AppService {
       return this.findBestBackgroundPicture(sprites.other['official-artwork']);
     }
     return sprites.front_default || sprites.back_default;
+  }
+
+  async getByName(name: string) {
+    const response = await this.pokemonRepository.getByName(name);
+    const specie = await this.pokemonRepository.getSpecie(response.id);
+    const background = this.findBestBackgroundPicture(response.sprites);
+    return convertPokemonToGetPokemonDTO(response, background, specie);
   }
 }

@@ -1,6 +1,7 @@
-import { Controller, Get, Logger, Query, Req } from '@nestjs/common';
+import { Controller, Get, Logger, Param, Query, Req } from '@nestjs/common';
 import {
   ApiExtraModels,
+  ApiParam,
   ApiQuery,
   ApiResponse,
   getSchemaPath,
@@ -8,7 +9,8 @@ import {
 import { Request } from 'express';
 import { AppService } from './app.service';
 import { PaginatedDTO } from './dto/paginated.dto';
-import { GetPokemonListDTO } from './dto/pokemon.adapter.dto';
+import { GetPokemonListDTO } from './dto/get-pokemon-list.dto';
+import { GetPokemonDTO } from './dto/get-pokemon.dto';
 
 @Controller('pokemon')
 export class AppController {
@@ -67,6 +69,20 @@ export class AppController {
       offset: offset ?? 0,
       limit: limit ?? 0,
       data,
+    };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Returns pokemon detail',
+    type: GetPokemonDTO,
+  })
+  @ApiParam({ name: 'name', description: 'Pokemon name to fetch data' })
+  @Get('/:name')
+  public async getByName(@Param('name') name: string) {
+    const response = await this.appService.getByName(name);
+    return {
+      data: response,
     };
   }
 }

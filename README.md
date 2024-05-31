@@ -24,7 +24,7 @@ To install run `npm install`
 
 ### Running local (development mode)
 
-`npm run start:start` runs the API on port `3000` and you can access it through `http://localhost:3000`.
+`npm run start` runs the API on port `3000` and you can access it through `http://localhost:3000`.
 
 ### Build
 

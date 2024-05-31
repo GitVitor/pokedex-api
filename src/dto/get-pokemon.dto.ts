@@ -7,6 +7,8 @@ export class GetPokemonDTO {
     name: string,
     attack: Stat,
     defense: Stat,
+    specialAttack: Stat,
+    specialDefense: Stat,
     types: Type[],
     background: string,
     pokedexEntryDescription: string,
@@ -14,6 +16,8 @@ export class GetPokemonDTO {
     this.name = name;
     this.attack = attack;
     this.defense = defense;
+    this.specialAttack = specialAttack;
+    this.specialDefense = specialDefense;
     this.types = types;
     this.background = background;
     this.pokedexEntryDescription = pokedexEntryDescription;
@@ -26,6 +30,12 @@ export class GetPokemonDTO {
 
   @ApiProperty({ description: 'Pokemon defense stats data' })
   defense: Stat;
+
+  @ApiProperty({ description: 'Pokemon special attack stats data' })
+  specialAttack: Stat;
+
+  @ApiProperty({ description: 'Pokemon special defense stats data' })
+  specialDefense: Stat;
 
   @ApiProperty({ description: 'Pokemon type i.e. poison, eletric, water' })
   types: Type[];
@@ -49,10 +59,21 @@ export function convertPokemonToGetPokemonDTO(
   const defense = pokemon.stats.filter((stat) => {
     return stat.stat.name === 'defense';
   })[0];
+
+  const specialDefense = pokemon.stats.filter((stat) => {
+    return stat.stat.name === 'special-defense';
+  })[0];
+
+  const specialAttack = pokemon.stats.filter((stat) => {
+    return stat.stat.name === 'special-attack';
+  })[0];
+
   const dtoData = new GetPokemonDTO(
     pokemon.name,
     attack,
     defense,
+    specialAttack,
+    specialDefense,
     pokemon.types,
     background,
     specie.flavor_text_entries[0].flavor_text,

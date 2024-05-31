@@ -29,3 +29,14 @@ To install run `npm install`
 ### Build
 
 To build that project just runs `npm run build`
+
+
+### Running with Docker
+
+Give that your terminal is running inside the API folder, you have to build the project
+
+- `docker build -t pokedex-api:1.0 ./`
+
+And then run the built image using (port 3000 below)
+
+- `docker run -p 3000:3000 pokedex-api:1.0`
